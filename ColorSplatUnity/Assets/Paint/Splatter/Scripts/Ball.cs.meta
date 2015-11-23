@@ -1,10 +1,12 @@
 fileFormatVersion: 2
 guid: 64b34adaac21c410cb205a40c3035224
-timeCreated: 1447677614
+timeCreated: 1448298207
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - splatter: {fileID: 172030, guid: 9ed06d8578b2e4136a84ad5f39e34ae2, type: 2}
+  - particles: {fileID: 184274, guid: 76210253e676f495cbe366949737d3e3, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
