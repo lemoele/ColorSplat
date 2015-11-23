@@ -4,42 +4,93 @@ using System.Collections.Generic;
 
 public class CharacterAI : MonoBehaviour {
 
-	public Animation anim;
-    public List<Transform> RndPositions; 
+    public Animation anim;
+    public GameObject camera;
+
+    private List<Transform> RndPos;
     private float localTime = 0.0f;
+    private string mode;
+    private Transform target;
 
 	void Start () {
-
-        // except shooting
         anim = GetComponent<Animation>();
+        RndPos = GameObject.Find("Characters").GetComponent<RndPositions>().RandomPositions; 
+
+
+        anim["Walk"].speed = 2.2f;
 
         // Set all animations to loop
         anim.wrapMode = WrapMode.Loop;
 
-        //anim.Play("Walk");
-        //anim.CrossFadeQueued("Walk");
+        camera = GameObject.Find("Main Camera");
+
+        mode = "Idle";
+        anim.Play("Idle");
 	}
 	
 	// Update is called once per frame
 	void Update () {
         localTime += Time.deltaTime/1.0f;
-        if (localTime > 2 & anim.IsPlaying("Walk")==false)
+
+        if (mode == "Idle")
         {
-            anim.CrossFade("Walk");
+            // Always face the camera
+            RotateTowards(camera.transform, this.transform, 10.0f);
+
+            if (localTime > 2)
+            {
+                mode = "Walk";
+                anim.CrossFade("Walk");
+
+                // Update target
+                int maxIndex = RndPos.Count;
+                int index = Random.Range(0, maxIndex);
+                target = RndPos[index];
+            }
         }
-        if (anim.IsPlaying("Walk"))
+        else if (mode == "Walk")
         {
-            MoveCharacter(RndPositions[0], this.transform);
+            // Check if to stop walk
+            float distance = Vector3.Distance(target.position, this.transform.position);
+
+            if (distance < 1.1f)
+            {
+                mode = "Idle";
+                anim.CrossFade("Idle");
+                localTime = 0.0f;
+            }
+            else
+            {
+                MoveCharacter(target, this.transform);
+            }
+        }
+        else if (mode == "Shop")
+        {
+
         }
 	}
 
 
     void MoveCharacter(Transform target, Transform cePos){
+        // Variables
+        float MaxSpeed = 0.1f;
+        float MaxRotationSpeed = 10.0f;
+        Vector3 targetPos = target.position - Vector3.Normalize(this.transform.position);
         
-        float MaxSpeed = 0.01f;
-        Vector3 tmpRotation = Vector3.RotateTowards(cePos.position, target.position, 100.0f, 100.0f);
-        //tmpRotation.z = 0;
-        this.transform.rotation = Quaternion.Euler(tmpRotation);
-        this.transform.position = Vector3.MoveTowards(cePos.position, target.position, MaxSpeed);
+        // Rotation
+        RotateTowards(target, cePos, MaxRotationSpeed);
+
+        // Movement
+        this.transform.position = Vector3.MoveTowards(cePos.position, targetPos, MaxSpeed);
+    }
+
+
+    void RotateTowards(Transform target, Transform cePos, float MaxRotationSpeed)
+    {
+        Vector3 targetDir = target.position - cePos.position;
+        float step = MaxRotationSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0f);
+        newDir.y = 0;
+        this.transform.rotation = Quaternion.LookRotation(newDir);
     }
 }
