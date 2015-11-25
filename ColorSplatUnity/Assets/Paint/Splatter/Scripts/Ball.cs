@@ -7,6 +7,14 @@ public class Ball : MonoBehaviour {
 	public GameObject particles;
 	private GameObject particlesClone;
 
+	void Start() {
+		transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+	}
+
+	void Update() {
+		transform.localScale += new Vector3(0.02f, 0.02f, 0.02f);
+	}
+
 	void OnCollisionEnter(Collision collision) {
 //		Vector3 new_pos = collision.contacts[0].point + new Vector3(0, 0, -0.5f);
 //		Instantiate(splatter, new_pos, Quaternion.FromToRotation(Vector3.up, collision.contacts[0].normal));

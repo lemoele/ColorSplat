@@ -3,18 +3,20 @@ using System.Collections;
 
 public class ThrowBall : MonoBehaviour {
 
+	public Camera cam;
 	public GameObject ball;
 	public Vector3 throwSpeed; 
-	public Vector3 ballPos; 
+	private Vector3 ballPos; 
 	private GameObject ballClone; 
 	
 	// Update is called once per frame
 	void Update () {
-		
-		if (Input.GetKeyDown("space"))
+
+		if (Input.GetMouseButtonDown(0))
 		{
-			Vector3 rand = new Vector3(Random.Range(-10, 10), Random.Range(-8, 8), 0);
-			ballClone = Instantiate(ball, ballPos + rand, transform.rotation) as GameObject;
+			Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane);
+			ballPos = cam.ScreenToWorldPoint(mousePos) + new Vector3(0, 0, 0.1f);
+			ballClone = Instantiate(ball, ballPos, transform.rotation) as GameObject;
 
 //			Color randColor = new Color(Random.Range(0, 255)/255, Random.Range(0, 255)/255, Random.Range(0, 255)/255);
 //			ballClone.GetComponent<MeshRenderer>().material.SetColor("_Albedo", randColor);

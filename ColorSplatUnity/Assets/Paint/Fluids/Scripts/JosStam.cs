@@ -7,15 +7,22 @@ public class JosStam : MonoBehaviour {
 	public float dt = 0.8f;
 	public float visc = 0.2f;
 	public int iterations = 10;
-
+	
+	Texture2D tex;
+	bool add = true;
 	int size;
+	int rowSize;
 	float[] u, v;
 	float[] u_prev, v_prev;
 	float[] dens, dens_prev;
 	
 	// Use this for initialization
 	void Start () {
+		tex = Instantiate(GetComponent<Renderer>().material.mainTexture) as Texture2D;
+		GetComponent<Renderer>().material.mainTexture = tex;
+
 		size = (N+2)*(N+2);
+		rowSize = N + 2;
 		dens = new float[size];
 		dens_prev = new float[size];
 		u = new float[size];
@@ -26,10 +33,16 @@ public class JosStam : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-//		get_from_UI ( dens_prev, u_prev, v_prev); 
+		// reset values
+		for (int i = 0; i < size; i++) {
+			dens_prev[i] = 0;
+			u_prev[i] = 0;
+			v_prev[i] = 0;
+		}
+		UserInput();
 		vel_step (u, v, u_prev, v_prev, dt); 
 		dens_step (dens, dens_prev, u, v, dt); 
-//		draw_dens (dens);
+		Draw();
 	}
 	
 	int IJK(int i, int j) {
@@ -83,7 +96,9 @@ public class JosStam : MonoBehaviour {
 				if (x<0.5f) x=0.5f; 
 				if (x>N+0.5f) x=N+0.5f; i0=(int)x; i1=i0+1; 
 				if (y<0.5f) y=0.5f; 
-				if (y>N+0.5f) y=N+0.5f; j0=(int)y; j1=j0+1; s1 = x-i0; s0 = 1-s1; t1 = y-j0; t0 = 1-t1;
+				if (y>N+0.5f) y=N+0.5f; j0=(int)y; j1=j0+1; 
+				s1 = x-i0; s0 = 1-s1; 
+				t1 = y-j0; t0 = 1-t1;
 				d[IJK(i,j)] = s0*(t0*d0[IJK(i0,j0)]+t1*d0[IJK(i0,j1)])+s1*(t0*d0[IJK(i1,j0)]+t1*d0[IJK(i1,j1)]);
 			}
 		}
@@ -127,8 +142,7 @@ public class JosStam : MonoBehaviour {
 	}
 
 	void vel_step (float[] u, float[] v, float[] u0, float[] v0,
-	               float dt )
-	{
+	               float dt ) {
 		add_source (u, u0, dt); 
 		add_source (v, v0, dt);
 		SWAP (u0, u); 
@@ -141,5 +155,40 @@ public class JosStam : MonoBehaviour {
 		advect (1, u, u0, u0, v0, dt); 
 		advect (2, v, v0, u0, v0, dt); 
 		project (u, v, u0, v0);
+	}
+
+	void UserInput() {
+		// draw on the water
+		if (Input.GetMouseButton(0)) {
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			RaycastHit hit;
+			if (Physics.Raycast(ray, out hit, 100)) {
+				// determine indices where the user clicked
+				int x = (int)(hit.point.x * N);
+				int y = (int)(hit.point.z * N);
+				int i = (x + 1) + (y + 1) * rowSize;
+				if (x < 1 || x > N-1 || y < 1 || y > N-1) return;
+				// add or dec density
+				dens_prev[i] += add ? 3f : -3f;
+				add = !add;
+				// add velocity
+				u_prev[i] += Input.GetAxis("Mouse X") * 0.5f;
+				v_prev[i] += Input.GetAxis("Mouse Y") * 0.5f;
+			}
+		}
+	}
+
+	void Draw() {
+		// visualize water
+		for (int y = 0; y < N; y++) {
+			for (int x = 0; x < N; x++) {
+				int i = (x + 1) + (y + 1) * rowSize;
+				float d = 5f * dens[i];
+				tex.SetPixel(x, y, new Color(u[i]*20 + 0.5f, v[i]*20 + 0.5f + d * 0.5f, 1 + d));
+				/*float d = 5f * dens[(x + 1) + (y + 1) * rowSize];
+				tex.SetPixel(x, y, new Color(0, d * 0.5f, d));*/
+			}
+		}
+		tex.Apply(false);
 	}
 }
