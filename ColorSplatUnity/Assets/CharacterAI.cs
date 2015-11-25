@@ -73,7 +73,7 @@ public class CharacterAI : MonoBehaviour {
 
     void MoveCharacter(Transform target, Transform cePos){
         // Variables
-        float MaxSpeed = 0.1f;
+        float MaxSpeed = 0.2f;
         float MaxRotationSpeed = 10.0f;
         Vector3 targetPos = target.position - Vector3.Normalize(this.transform.position);
         
