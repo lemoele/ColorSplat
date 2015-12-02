@@ -15,7 +15,6 @@ public class TuioTest : MonoBehaviour, TuioListener {
 	private object blobSync = new object();
 	private int port = 3333;
 
-	private bool fullscreen;
 	private bool verbose;
 	
 	private float Xpos;
@@ -24,7 +23,6 @@ public class TuioTest : MonoBehaviour, TuioListener {
 	// Use this for initialization
 	void Start () {
 		verbose = true;
-		fullscreen = false;
 
 		objectList = new Dictionary<long,TuioObject>(128);
 		cursorList = new Dictionary<long,TuioCursor>(128);

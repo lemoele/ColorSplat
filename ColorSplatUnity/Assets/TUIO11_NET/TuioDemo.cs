@@ -37,15 +37,15 @@ using TUIO;
 		private object objectSync = new object();
 		private object blobSync = new object();
 //
-		public static int width, height;
-		private int window_width =  4096;
-		private int window_height = 2400;
-		private int window_left = 0;
-		private int window_top = 0;
+//		public static int width, height;
+//		private int window_width =  4096;
+//		private int window_height = 2400;
+//		private int window_left = 0;
+//		private int window_top = 0;
 //		private int screen_width = Screen.PrimaryScreen.Bounds.Width;
 //		private int screen_height = Screen.PrimaryScreen.Bounds.Height;
 //
-		private bool fullscreen;
+//		private bool fullscreen;
 		private bool verbose;
 //
 ////		SolidBrush blackBrush = new SolidBrush(Color.Black);
@@ -57,9 +57,9 @@ using TUIO;
 		public TuioDemo(int port) {
 		
 			verbose = true;
-			fullscreen = false;
-			width = window_width;
-			height = window_height;
+//			fullscreen = false;
+//			width = window_width;
+//			height = window_height;
 
 //			this.ClientSize = new System.Drawing.Size(width, height);
 //			this.Name = "TuioDemo";
@@ -74,6 +74,7 @@ using TUIO;
 
 			objectList = new Dictionary<long,TuioDemoObject>(128);
 			cursorList = new Dictionary<long,TuioCursor>(128);
+			blobList = new Dictionary<long,TuioBlob>(128);
 			
 			client = new TuioClient(port);
 			client.addTuioListener(this);
